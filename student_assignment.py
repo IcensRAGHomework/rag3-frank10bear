@@ -46,12 +46,40 @@ def generate_hw01():
         print("insert " + str(collection.count) + " count(s) to collection. finish")
         return collection
     else:
-        print("collection is not empty, skip insert")
+        print("collection is not empty, skip insert, then return " + str(collection.count()) + " count(s)")
+        return collection
     
     
 def generate_hw02(question, city, store_type, start_date, end_date):
-    pass
-    
+    collection = generate_hw01()
+    query_results = collection.query(
+        query_texts=[question],
+        n_results=10,
+        include=["metadatas", "distances"],
+        where={
+            "$and": [
+                {"date": {"$gte": int(start_date.timestamp())}}, # greater than or equal
+                {"date": {"$lte": int(end_date.timestamp())}}, # less than or equal
+                {"type": {"$in": store_type}},
+                {"city": {"$in": city}}
+            ]
+        }
+        )
+    print(len((query_results['ids'])[0]))
+    print(query_results.keys())
+    filtered_similarity_store_name = []
+    for index in range(len(query_results['ids'])):
+        for metadata, distance in zip(query_results['metadatas'][index], query_results['distances'][index]):
+            similarity = 1 - distance
+            print("metadata name="+metadata['name']+", distance="+str(distance) + ", similarity=" + str(similarity))
+            if similarity > 0.8:
+                filtered_similarity_store_name.append([metadata['name'], similarity])
+    print(filtered_similarity_store_name)
+    filtered_similarity_store_name.sort(key=lambda x: x[1], reverse=True)
+    filter_store_name, filter_similarity = zip(*filtered_similarity_store_name)
+    print(filter_store_name)
+    return filter_store_name
+       
 def generate_hw03(question, store_name, new_store_name, city, store_type):
     pass
     
@@ -73,4 +101,6 @@ def getOrCreateCollection(question):
     return collection
 
 if __name__ == "__main__" :
-    generate_hw01()
+    #generate_hw01()
+    generate_hw02("我想要找有關茶餐點的店家", ["宜蘭縣", "新北市"], ["美食"], datetime.datetime(2024, 4, 1), datetime.datetime(2024, 5, 1))
+    #generate_hw03("我想要找南投縣的田媽媽餐廳，招牌是蕎麥麵", "耄饕客棧", "田媽媽（耄饕客棧）", ["南投縣"], ["美食"])

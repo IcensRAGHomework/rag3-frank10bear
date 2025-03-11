@@ -1,6 +1,8 @@
 import datetime
 import chromadb
 import traceback
+import pandas
+import os
 
 from chromadb.utils import embedding_functions
 
@@ -10,9 +12,42 @@ gpt_emb_version = 'text-embedding-ada-002'
 gpt_emb_config = get_model_configuration(gpt_emb_version)
 
 dbpath = "./"
-
+csv_file_name = "COA_OpenData.csv"
 def generate_hw01():
-    pass
+    print("run generate_hw01")
+    #persistentClient = PersistentClient("./chroma", )
+    
+    if not os.path.exists(csv_file_name):
+        print(f"File {csv_file_name} does not exist.")
+        return
+
+    collection = getOrCreateCollection("")
+    if collection.count() == 0:
+        print("collection is empty")
+        dataframe = pandas.read_csv(csv_file_name)
+        print("idx=")
+        for idx, row in dataframe.iterrows():
+            print(str(idx) + ", ")
+            metadata = {
+                "file_name": csv_file_name,
+                "name": row["Name"],
+                "type": row["Type"],
+                "address": row["Address"],
+                "tel": row["Tel"],
+                "city": row["City"],
+                "town": row["Town"],
+                "date": int(datetime.datetime.strptime(row['CreateDate'], '%Y-%m-%d').timestamp())
+            }
+            collection.add(
+                ids=[str(idx)],
+                metadatas=[metadata],
+                documents=[row["HostWords"]]
+            )
+        print("insert " + str(collection.count) + " count(s) to collection. finish")
+        return collection
+    else:
+        print("collection is not empty, skip insert")
+    
     
 def generate_hw02(question, city, store_type, start_date, end_date):
     pass
@@ -20,7 +55,7 @@ def generate_hw02(question, city, store_type, start_date, end_date):
 def generate_hw03(question, store_name, new_store_name, city, store_type):
     pass
     
-def demo(question):
+def getOrCreateCollection(question):
     chroma_client = chromadb.PersistentClient(path=dbpath)
     openai_ef = embedding_functions.OpenAIEmbeddingFunction(
         api_key = gpt_emb_config['api_key'],
@@ -36,3 +71,6 @@ def demo(question):
     )
     
     return collection
+
+if __name__ == "__main__" :
+    generate_hw01()

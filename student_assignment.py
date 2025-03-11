@@ -114,7 +114,7 @@ def generate_hw03(question, store_name, new_store_name, city, store_type):
     filtered_similarity_store_name.sort(key=lambda x: x[1], reverse=True)
     filter_store_name, filter_similarity = zip(*filtered_similarity_store_name)
     print(filter_store_name)
-    
+    return filter_store_name
     
 def getOrCreateCollection(question):
     chroma_client = chromadb.PersistentClient(path=dbpath)

@@ -43,7 +43,7 @@ def generate_hw01():
                 metadatas=[metadata],
                 documents=[row["HostWords"]]
             )
-        print("insert " + str(collection.count) + " count(s) to collection. finish")
+        print("insert " + str(collection.count()) + " count(s) to collection. finish")
         return collection
     else:
         print("collection is not empty, skip insert, then return " + str(collection.count()) + " count(s)")
@@ -77,8 +77,8 @@ def generate_hw02(question, city, store_type, start_date, end_date):
     print(filtered_similarity_store_name)
     filtered_similarity_store_name.sort(key=lambda x: x[1], reverse=True)
     filter_store_name, filter_similarity = zip(*filtered_similarity_store_name)
-    print(filter_store_name)
-    return filter_store_name
+    print(list(filter_store_name))
+    return list(filter_store_name)
        
 def generate_hw03(question, store_name, new_store_name, city, store_type):
     collection = generate_hw01()
@@ -113,8 +113,8 @@ def generate_hw03(question, store_name, new_store_name, city, store_type):
     print(filtered_similarity_store_name)
     filtered_similarity_store_name.sort(key=lambda x: x[1], reverse=True)
     filter_store_name, filter_similarity = zip(*filtered_similarity_store_name)
-    print(filter_store_name)
-    return filter_store_name
+    print(list(filter_store_name))
+    return list(filter_store_name)
     
 def getOrCreateCollection(question):
     chroma_client = chromadb.PersistentClient(path=dbpath)
@@ -136,4 +136,4 @@ def getOrCreateCollection(question):
 if __name__ == "__main__" :
     #generate_hw01()
     #generate_hw02("我想要找有關茶餐點的店家", ["宜蘭縣", "新北市"], ["美食"], datetime.datetime(2024, 4, 1), datetime.datetime(2024, 5, 1))
-    generate_hw03("我想要找南投縣的田媽媽餐廳，招牌是蕎麥麵", "耄饕客棧", "田媽媽（耄饕客棧）", ["南投縣"], ["美食"])
+    #generate_hw03("我想要找南投縣的田媽媽餐廳，招牌是蕎麥麵", "耄饕客棧", "田媽媽（耄饕客棧）", ["南投縣"], ["美食"])

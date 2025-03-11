@@ -81,7 +81,40 @@ def generate_hw02(question, city, store_type, start_date, end_date):
     return filter_store_name
        
 def generate_hw03(question, store_name, new_store_name, city, store_type):
-    pass
+    collection = generate_hw01()
+    get_selected_store = collection.get(where={"name": store_name})
+    print(get_selected_store.get("ids")[0])
+    target_store_name_metadata = get_selected_store.get("metadatas")[0]
+    target_store_name_metadata["new_store_name"] = new_store_name
+    print(target_store_name_metadata)
+    collection.update(ids=get_selected_store.get("ids"), metadatas=[target_store_name_metadata])
+    
+    query_results = collection.query(
+    query_texts=[question],
+    n_results=10,
+    include=["metadatas", "distances"],
+    where={
+        "$and": [
+            {"type": {"$in": store_type}},
+            {"city": {"$in": city}}
+        ]
+    }
+    )
+    filtered_similarity_store_name = []
+    for index in range(len(query_results['ids'])):
+        for metadata, distance in zip(query_results['metadatas'][index], query_results['distances'][index]):
+            similarity = 1 - distance
+            print("metadata name="+metadata['name']+", distance="+str(distance) + ", similarity=" + str(similarity))
+            if similarity > 0.8:
+                if metadata.get('new_store_name', "") != "":
+                    filtered_similarity_store_name.append([metadata['new_store_name'], similarity])
+                else:
+                    filtered_similarity_store_name.append([metadata['name'], similarity])
+    print(filtered_similarity_store_name)
+    filtered_similarity_store_name.sort(key=lambda x: x[1], reverse=True)
+    filter_store_name, filter_similarity = zip(*filtered_similarity_store_name)
+    print(filter_store_name)
+    
     
 def getOrCreateCollection(question):
     chroma_client = chromadb.PersistentClient(path=dbpath)
@@ -102,5 +135,5 @@ def getOrCreateCollection(question):
 
 if __name__ == "__main__" :
     #generate_hw01()
-    generate_hw02("我想要找有關茶餐點的店家", ["宜蘭縣", "新北市"], ["美食"], datetime.datetime(2024, 4, 1), datetime.datetime(2024, 5, 1))
-    #generate_hw03("我想要找南投縣的田媽媽餐廳，招牌是蕎麥麵", "耄饕客棧", "田媽媽（耄饕客棧）", ["南投縣"], ["美食"])
+    #generate_hw02("我想要找有關茶餐點的店家", ["宜蘭縣", "新北市"], ["美食"], datetime.datetime(2024, 4, 1), datetime.datetime(2024, 5, 1))
+    generate_hw03("我想要找南投縣的田媽媽餐廳，招牌是蕎麥麵", "耄饕客棧", "田媽媽（耄饕客棧）", ["南投縣"], ["美食"])

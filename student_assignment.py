@@ -17,9 +17,9 @@ def generate_hw01():
     print("run generate_hw01")
     #persistentClient = PersistentClient("./chroma", )
     
-    if not os.path.exists(csv_file_name):
-        print(f"File {csv_file_name} does not exist.")
-        return
+    # if not os.path.exists(csv_file_name):
+    #     print(f"File {csv_file_name} does not exist.")
+    #     return
 
     collection = getOrCreateCollection("")
     if collection.count() == 0:
@@ -44,6 +44,7 @@ def generate_hw01():
                 documents=[row["HostWords"]]
             )
         print("insert " + str(collection.count()) + " count(s) to collection. finish")
+        print(collection)
         return collection
     else:
         print("collection is not empty, skip insert, then return " + str(collection.count()) + " count(s)")
@@ -134,6 +135,6 @@ def getOrCreateCollection(question):
     return collection
 
 if __name__ == "__main__" :
-    #generate_hw01()
+    generate_hw01()
     #generate_hw02("我想要找有關茶餐點的店家", ["宜蘭縣", "新北市"], ["美食"], datetime.datetime(2024, 4, 1), datetime.datetime(2024, 5, 1))
     #generate_hw03("我想要找南投縣的田媽媽餐廳，招牌是蕎麥麵", "耄饕客棧", "田媽媽（耄饕客棧）", ["南投縣"], ["美食"])
